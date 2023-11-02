@@ -6,6 +6,7 @@ use Larasahib\AppInsightsLaravel\Exceptions\InvalidInstrumentationKeyException;
 class InstrumentationKey
 {
     protected $instrumentationKey;
+    protected $flushQueueAfterSeconds;
 
     public function __construct()
     {
@@ -15,7 +16,7 @@ class InstrumentationKey
     protected function setInstrumentationKey()
     {
         $instrumentationKey = config('AppInsightsLaravel.instrumentationKey');
-
+        $this->flushQueueAfterSeconds = config('AppInsightsLaravel.flushQueueAfterSeconds');
         if ( ! empty($instrumentationKey)
             && $this->checkInstrumentationKeyValidity($instrumentationKey))
         {
@@ -35,5 +36,10 @@ class InstrumentationKey
         }
 
         throw new InvalidInstrumentationKeyException("'{$instrumentationKey}' is not a valid Microsoft Application Insights instrumentation key.");
+    }
+
+    public function getFlushQueueAfterSeconds()
+    {
+        return $this->flushQueueAfterSeconds ?? 0;
     }
 }

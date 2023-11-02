@@ -16,5 +16,6 @@ return [
      */
 
     'instrumentationKey' => env('MS_INSTRUMENTATION_KEY', null),
+    'flushQueueAfterSeconds' => env('MS_AI_FLUSH_QUEUE_AFTER_SECONDS', 0),
 
 ];

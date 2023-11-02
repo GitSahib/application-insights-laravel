@@ -46,7 +46,8 @@ class AppInsightsHelpers
 
         $properties = $this->getPageViewProperties($request);
         \AIServer::trackMessage('browse_duration', $properties);
-        \AIQueue::dispatch(\AIServer::getChannel()->getQueue())->delay(now()->addSeconds(3));
+        $this->flush();
+        
     }
 
 
@@ -77,7 +78,7 @@ class AppInsightsHelpers
             $this->getRequestProperties($request),
             $this->getRequestMeasurements($request, $response)
         );
-        \AIQueue::dispatch(\AIServer::getChannel()->getQueue())->delay(now()->addSeconds(3));
+        $this->flush();
     }
 
     /**
@@ -92,9 +93,37 @@ class AppInsightsHelpers
             return;
         }
         \AIServer::trackException($e, $this->getRequestPropertiesFromException($e));
-        \AIQueue::dispatch(\AIServer::getChannel()->getQueue())->delay(now()->addSeconds(3));
+        $this->flush();
     }
 
+    /**
+     * flushes the telemery queue, will wait for the time provided in config
+     * if time was not set in config then it wil flush immediately
+     */
+    private function flush()
+    {
+        $queue_seconds = $this->appInsights->getFlushQueueAfterSeconds();
+        if($queue_seconds)
+        {
+            \AIQueue::dispatch(\AIServer::getChannel()->getQueue())
+            ->delay(now()->addSeconds($queue_seconds));
+        }
+        else
+        {
+            try 
+            {  
+               \AIServer::flush();
+            }        
+            catch (RequestException $e) 
+            {
+                Log::debug('RequestException: Could not flush AIServer server. Error:'.$e->getMessage());
+            }
+            catch(Exception $e)
+            {
+                Log::debug('Exception: Could not flush AIServer server. Error:'.$e->getMessage());
+            }
+        }
+    }
 
     /**
      * Get request properties from the exception trace, if available

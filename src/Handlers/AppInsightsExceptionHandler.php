@@ -1,12 +1,23 @@
 <?php
 namespace Larasahib\AppInsightsLaravel\Handlers;
-
+use Larasahib\AppInsightsLaravel\AppInsightsHelpers;
 use Throwable;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class AppInsightsExceptionHandler extends ExceptionHandler
 {
+    /**
+     * @var appInsightsHelpers
+     */
+    private AppInsightsHelpers $appInsightsHelpers;
+
+
+    public function __construct(AppInsightsHelpers $appInsightsHelpers, Container $container)
+    {
+        parent::__construct($container);
+        $this->appInsightsHelpers = $appInsightsHelpers;        
+    }
     /**
      * Report or log an exception.
      *
@@ -17,17 +28,7 @@ class AppInsightsExceptionHandler extends ExceptionHandler
      */
     public function report(Throwable $e)
     { 
-        if($this->telemetryEnabled())
-        {
-            \AIServer::trackException($e);
-            \AIQueue::dispatch(\AIServer::getChannel()->getQueue())
-            ->delay(now()->addSeconds(3));
-        }
+        $this->appInsightsHelpers->trackException($e);
         return parent::report($e);
-    }
-
-    private function telemetryEnabled()
-    {
-        return \AIServer::getChannel() != null;
     }
 }
