@@ -11,7 +11,7 @@
         "monitoring",
         "logging"
     ],    
-    "minimum-stability": "1.0.0",
+    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Sahib",
