@@ -17,8 +17,17 @@ class AppInsightsExceptionHandler extends ExceptionHandler
      */
     public function report(Throwable $e)
     { 
-        \AIServer::trackException($e);
-        \AIQueue::dispatch(\AIServer::getChannel()->getQueue())->delay(now()->addSeconds(3));
+        if($this->telemetryEnabled())
+        {
+            \AIServer::trackException($e);
+            \AIQueue::dispatch(\AIServer::getChannel()->getQueue())
+            ->delay(now()->addSeconds(3));
+        }
         return parent::report($e);
+    }
+
+    private function telemetryEnabled()
+    {
+        return \AIServer::getChannel() != null;
     }
 }
