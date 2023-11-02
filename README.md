@@ -86,7 +86,7 @@ The exception handler will send additional properties to Application Insights, a
 In order to register page view information from the client with Application Insights, simply insert the following code into your Blade views:
 
 ```php
-{!! AIClient::javascript() !!}
+{!! \AIClient::javascript() !!}
 ```
 
 NOTE: Microsoft recommend that you put the script in the `<head>` section of your pages, in order to calculate the fullest extent of page load time on the client.
@@ -97,8 +97,8 @@ If you want to use any of the underlying [ApplicationInsights-PHP](https://githu
 
 ```php
 ...
-AIServer::trackEvent('Test event');
-AIServer::flush();//immediate send
+\AIServer::trackEvent('Test event');
+\AIServer::flush();//immediate send
 \AIQueue::dispatch(\AIServer::getChannel()->getQueue())->delay(now()->addSeconds(3));//use laravel queue to send data later
 ...
 ```
