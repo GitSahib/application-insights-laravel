@@ -12,7 +12,7 @@ Update the `require` section of your application's **composer.json** file:
 ```js
 "require": {
 	...
-	"sahib/application-insights-laravel": "dev-master",
+	"sahib/application-insights-laravel": "1.0.1",
 	...
 }
 ```
@@ -109,3 +109,5 @@ See the [ApplicationInsights-PHP](https://github.com/Microsoft/ApplicationInsigh
 
 ### dev-master
 - Initial commit.
+### 1.0.1
+- Stable release
