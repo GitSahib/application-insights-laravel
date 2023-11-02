@@ -1,0 +1,41 @@
+{
+    "name": "sahib/application-insights-laravel",
+    "description": "Microsoft Azure Application Insights for Laravel 10",
+    "homepage": "https://github.com/GitSahib/application-insights-laravel",
+    "license": "MIT",
+    "keywords": [
+        "Laravel",
+        "Microsoft",
+        "Azure",
+        "Application Insights",
+        "monitoring",
+        "logging"
+    ],
+    "authors": [
+        {
+            "name": "Sahib",
+            "email": "sahib.zer@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "app-insights-php/client": "^0.3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Sahib\\AppInsightsLaravel\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Sahib\\AppInsightsLaravel\\Providers\\AppInsightsServiceProvider"
+            ],
+            "aliases": {
+                "AIClient": "Sahib\\AppInsightsLaravel\\Facades\\AppInsightsClientFacade",
+                "AIServer": "Sahib\\AppInsightsLaravel\\Facades\\AppInsightsServerFacade",
+                "AIQueue": "Sahib\\AppInsightsLaravel\\Facades\\AppInsightsQueueFacade"
+            }
+        }
+    }
+}
