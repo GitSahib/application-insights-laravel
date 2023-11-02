@@ -1,5 +1,5 @@
 {
-    "name": "sahib/application-insights-laravel",
+    "name": "larasahib/application-insights-laravel",
     "description": "Microsoft Azure Application Insights for Laravel 10",
     "homepage": "https://github.com/GitSahib/application-insights-laravel",
     "license": "MIT",
@@ -10,7 +10,8 @@
         "Application Insights",
         "monitoring",
         "logging"
-    ],
+    ],    
+    "minimum-stability": "1.0.0",
     "authors": [
         {
             "name": "Sahib",
