@@ -12,7 +12,7 @@ Update the `require` section of your application's **composer.json** file:
 ```js
 "require": {
 	...
-	"larasahib/application-insights-laravel": "1.0.2",
+	"larasahib/application-insights-laravel": "1.0.4",
 	...
 }
 ```
