@@ -1,7 +1,7 @@
 <?php
-namespace Sahib\AppInsightsLaravel;
+namespace Larasahib\AppInsightsLaravel;
 
-use Sahib\AppInsightsLaravel\Exceptions\InvalidInstrumentationKeyException;
+use Larasahib\AppInsightsLaravel\Exceptions\InvalidInstrumentationKeyException;
 
 class InstrumentationKey
 {

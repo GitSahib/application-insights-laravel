@@ -1,5 +1,5 @@
 <?php
-namespace Sahib\AppInsightsLaravel\Exceptions;
+namespace Larasahib\AppInsightsLaravel\Exceptions;
 
 class AppInsightsException extends \Exception
 {

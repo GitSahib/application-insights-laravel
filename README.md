@@ -12,7 +12,7 @@ Update the `require` section of your application's **composer.json** file:
 ```js
 "require": {
 	...
-	"sahib/application-insights-laravel": "1.0.1",
+	"larasahib/application-insights-laravel": "1.0.2",
 	...
 }
 ```
@@ -74,7 +74,7 @@ To report exceptions that occur in your application, use the provided exception 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 # Insert this line
-use Sahib\AppInsightsLaravel\Handlers\AppInsightsExceptionHandler as ExceptionHandler;
+use Larasahib\AppInsightsLaravel\Handlers\AppInsightsExceptionHandler as ExceptionHandler;
 
 ...
 ```
@@ -111,3 +111,5 @@ See the [ApplicationInsights-PHP](https://github.com/Microsoft/ApplicationInsigh
 - Initial commit.
 ### 1.0.1
 - Stable release
+### 1.0.2
+- Renaming classes to more nuique names

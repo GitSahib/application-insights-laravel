@@ -1,8 +1,8 @@
 <?php
-namespace Sahib\AppInsightsLaravel\Middleware;
+namespace Larasahib\AppInsightsLaravel\Middleware;
 
 use Closure;
-use Sahib\AppInsightsLaravel\AppInsightsHelpers;
+use Larasahib\AppInsightsLaravel\AppInsightsHelpers;
 
 class AppInsightsMiddleware
 {

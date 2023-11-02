@@ -1,5 +1,5 @@
 <?php
-namespace Sahib\AppInsightsLaravel\Handlers;
+namespace Larasahib\AppInsightsLaravel\Handlers;
 
 use Throwable;
 use Illuminate\Contracts\Container\Container;

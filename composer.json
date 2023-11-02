@@ -11,7 +11,7 @@
         "monitoring",
         "logging"
     ],    
-    "minimum-stability": "dev",
+    "minimum-stability": "1.0.0",
     "authors": [
         {
             "name": "Sahib",
@@ -24,18 +24,18 @@
     },
     "autoload": {
         "psr-4": {
-            "Sahib\\AppInsightsLaravel\\": "src/"
+            "Larasahib\\AppInsightsLaravel\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Sahib\\AppInsightsLaravel\\Providers\\AppInsightsServiceProvider"
+                "Larasahib\\AppInsightsLaravel\\Providers\\AppInsightsServiceProvider"
             ],
             "aliases": {
-                "AIClient": "Sahib\\AppInsightsLaravel\\Facades\\AppInsightsClientFacade",
-                "AIServer": "Sahib\\AppInsightsLaravel\\Facades\\AppInsightsServerFacade",
-                "AIQueue": "Sahib\\AppInsightsLaravel\\Facades\\AppInsightsQueueFacade"
+                "AIClient": "Larasahib\\AppInsightsLaravel\\Facades\\AppInsightsClientFacade",
+                "AIServer": "Larasahib\\AppInsightsLaravel\\Facades\\AppInsightsServerFacade",
+                "AIQueue": "Larasahib\\AppInsightsLaravel\\Facades\\AppInsightsQueueFacade"
             }
         }
     }

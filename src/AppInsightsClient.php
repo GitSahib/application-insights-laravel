@@ -1,4 +1,4 @@
-<?php namespace Sahib\AppInsightsLaravel;
+<?php namespace Larasahib\AppInsightsLaravel;
 
 class AppInsightsClient extends InstrumentationKey
 {

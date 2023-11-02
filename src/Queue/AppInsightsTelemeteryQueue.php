@@ -1,5 +1,5 @@
 <?php
-namespace Sahib\AppInsightsLaravel\Queue;
+namespace Larasahib\AppInsightsLaravel\Queue;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;

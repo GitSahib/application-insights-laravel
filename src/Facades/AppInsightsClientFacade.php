@@ -1,4 +1,4 @@
-<?php namespace Sahib\AppInsightsLaravel\Facades;
+<?php namespace Larasahib\AppInsightsLaravel\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

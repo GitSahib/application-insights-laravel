@@ -1,6 +1,6 @@
 <?php 
 
-namespace Sahib\AppInsightsLaravel\Facades;
+namespace Larasahib\AppInsightsLaravel\Facades;
 
 use Illuminate\Support\Facades\Facade;
 

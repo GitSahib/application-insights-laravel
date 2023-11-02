@@ -1,4 +1,4 @@
-<?php namespace Sahib\AppInsightsLaravel\Facades;
+<?php namespace Larasahib\AppInsightsLaravel\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
@@ -11,6 +11,6 @@ class AppInsightsQueueFacade extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return \Sahib\AppInsightsLaravel\Queue\AppInsightsTelemeteryQueue::class;
+        return \Larasahib\AppInsightsLaravel\Queue\AppInsightsTelemeteryQueue::class;
     }
 }

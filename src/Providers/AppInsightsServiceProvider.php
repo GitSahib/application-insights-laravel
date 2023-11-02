@@ -1,14 +1,14 @@
 <?php 
 
-namespace Sahib\AppInsightsLaravel\Providers;
+namespace Larasahib\AppInsightsLaravel\Providers;
 
 use ApplicationInsights\Telemetry_Client;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
-use Sahib\AppInsightsLaravel\Queue\AppInsightsTelemeteryQueue;
-use Sahib\AppInsightsLaravel\Middleware\AppInsightsMiddleware;
-use Sahib\AppInsightsLaravel\AppInsightsClient;
-use Sahib\AppInsightsLaravel\AppInsightsHelpers;
-use Sahib\AppInsightsLaravel\AppInsightsServer;
+use Larasahib\AppInsightsLaravel\Queue\AppInsightsTelemeteryQueue;
+use Larasahib\AppInsightsLaravel\Middleware\AppInsightsMiddleware;
+use Larasahib\AppInsightsLaravel\AppInsightsClient;
+use Larasahib\AppInsightsLaravel\AppInsightsHelpers;
+use Larasahib\AppInsightsLaravel\AppInsightsServer;
 
 class AppInsightsServiceProvider extends LaravelServiceProvider {
 

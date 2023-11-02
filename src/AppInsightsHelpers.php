@@ -1,5 +1,5 @@
 <?php
-namespace Sahib\AppInsightsLaravel;
+namespace Larasahib\AppInsightsLaravel;
 
 use Throwable;
 use GuzzleHttp\Exception\RequestException;

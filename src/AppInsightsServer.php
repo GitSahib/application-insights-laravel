@@ -1,5 +1,5 @@
 <?php
-namespace Sahib\AppInsightsLaravel;
+namespace Larasahib\AppInsightsLaravel;
 
 use ApplicationInsights\Telemetry_Client;
 
