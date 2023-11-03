@@ -29,11 +29,6 @@ class AppInsightsHelpers
      */
     public function trackPageViewDuration($request)
     {
-        if($request->expectsJson())
-        {
-            return;
-        }
-
         if (!$this->telemetryEnabled()) 
         {
             return;
@@ -158,11 +153,6 @@ class AppInsightsHelpers
      */
     public function flashPageInfo($request)
     {
-        if($request->expectsJson())
-        {
-            return;
-        }
-
         if (!$this->telemetryEnabled())
         {
             return;

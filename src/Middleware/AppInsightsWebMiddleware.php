@@ -4,7 +4,7 @@ namespace Larasahib\AppInsightsLaravel\Middleware;
 use Closure;
 use Larasahib\AppInsightsLaravel\AppInsightsHelpers;
 
-class AppInsightsMiddleware
+class AppInsightsWebMiddleware
 {
 
     /**
@@ -19,7 +19,7 @@ class AppInsightsMiddleware
     public function __construct(AppInsightsHelpers $appInsightsHelpers)
     {
         $this->appInsightsHelpers = $appInsightsHelpers;
-    }
+    } 
 
     /**
      * Handle an incoming request.
