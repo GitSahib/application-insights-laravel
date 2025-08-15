@@ -99,7 +99,7 @@ class AppInsightsHelpers
         $queue_seconds = $this->appInsights->getFlushQueueAfterSeconds();
         if($queue_seconds)
         {
-            \AIQueue::dispatch(\AIServer::getChannel()->getQueue())
+            \AIQueue::dispatch(\AIServer::getQueue())
             ->delay(now()->addSeconds($queue_seconds));
         }
         else
