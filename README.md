@@ -110,11 +110,69 @@ If you want to use any of the underlying [ApplicationInsights-PHP](https://githu
 
 See the [ApplicationInsights-PHP](https://github.com/Microsoft/ApplicationInsights-PHP) page for more information on the available methods.
 
-## Version History
+### 📦 Version History
 
-### dev-master
-- Initial commit.
-### 1.0.1
-- Stable release
-### 1.0.2
-- Renaming classes to more nuique names
+#### ✅ **dev-master**
+
+* Initial commit with basic Laravel integration.
+* Included dependency on `microsoft/application-insights`.
+
+---
+
+#### 📦 **1.0.1**
+
+* First stable release.
+* Basic support for tracking requests and exceptions using Microsoft Application Insights PHP SDK.
+* Registered Laravel service provider and middleware for web & API.
+
+---
+
+#### 📦 **1.0.2**
+
+* Refactored and renamed internal classes to avoid naming conflicts and improve maintainability.
+* Improved configuration publishing and service bindings.
+
+---
+
+#### 📦 **1.0.3**
+
+* Added queue support via `AppInsightsTelemetryQueue`.
+* Enabled asynchronous event logging using Laravel queues.
+
+---
+
+#### 📦 **1.0.4**
+
+* Minor fixes to config merging and bootstrapping.
+* Added ability to set instrumentation key via environment variable.
+
+---
+
+#### 📦 **1.0.5**
+
+* Fixed service provider registration issues in Laravel 10.
+* Added support for Laravel's `config:cache`.
+
+---
+
+#### 📦 **1.0.6**
+
+* Deprecated usage of `microsoft/application-insights` SDK.
+* Prepared for a complete rewrite using a custom telemetry client.
+
+---
+
+#### 🚀 **1.0.7**
+
+* ✅ **Replaced dependency on the deprecated Application Insights SDK** with a custom-built HTTP client.
+* ✅ **Implemented custom `Telemetry_Client` class** compatible with Application Insights ingestion API.
+* ✅ Support for tracking:
+
+  * Requests
+  * Exceptions
+  * Custom Events
+  * Traces (Logs)
+* ✅ Introduced `flush()` mechanism with NDJSON batching.
+* ✅ Removed reliance on outdated or unsupported packages.
+* ✅ Maintained backward compatibility with existing service provider and class interfaces.
+* 🧪 Enhanced logging and error handling for production robustness.

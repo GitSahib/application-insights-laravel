@@ -2,7 +2,7 @@
 
 namespace Larasahib\AppInsightsLaravel\Providers;
 
-use ApplicationInsights\Telemetry_Client;
+use Larasahib\AppInsightsLaravel\Clients\Telemetry_Client;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Larasahib\AppInsightsLaravel\Queue\AppInsightsTelemeteryQueue;
 use Larasahib\AppInsightsLaravel\Middleware\AppInsightsWebMiddleware;
