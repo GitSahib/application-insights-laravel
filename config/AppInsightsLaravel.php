@@ -17,5 +17,7 @@ return [
 
     'instrumentationKey' => env('MS_INSTRUMENTATION_KEY', null),
     'flushQueueAfterSeconds' => env('MS_AI_FLUSH_QUEUE_AFTER_SECONDS', 0),
+    'enableLocalLogging' => env('MS_AI_ENABLE_LOGGING', 0),
+    'connectionString' => env('MS_AI_CONNECTION_STRING', null),
 
 ];

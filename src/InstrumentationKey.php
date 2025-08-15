@@ -5,37 +5,32 @@ use Larasahib\AppInsightsLaravel\Exceptions\InvalidInstrumentationKeyException;
 
 class InstrumentationKey
 {
-    protected $instrumentationKey;
     protected $flushQueueAfterSeconds;
+    protected $connectionString;
+    protected $instrumentationKey;
 
     public function __construct()
     {
-        $this->setInstrumentationKey();
+        $this->setConnectionString();
     }
 
-    protected function setInstrumentationKey()
+    protected function setConnectionString()
     {
-        $instrumentationKey = config('AppInsightsLaravel.instrumentationKey');
         $this->flushQueueAfterSeconds = config('AppInsightsLaravel.flushQueueAfterSeconds');
-        if ( ! empty($instrumentationKey)
-            && $this->checkInstrumentationKeyValidity($instrumentationKey))
-        {
-            $this->instrumentationKey = $instrumentationKey;
+        $this->instrumentationKey = config('AppInsightsLaravel.instrumentationKey');
 
+        $connectionString = config('AppInsightsLaravel.connectionString');
+        if (!empty($connectionString)) {
+            $this->connectionString = $connectionString;
+            return;
+        }
+        else if (!empty($this->instrumentationKey)) {
+            //deprecated
+            \Log::warning('Set MS_AI_CONNECTION_STRING in your .env file to use connection string instead of instrumentation key.');
             return;
         }
 
-        $this->instrumentationKey = null;
-    }
-
-    protected function checkInstrumentationKeyValidity($instrumentationKey)
-    {
-        if (preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $instrumentationKey) === 1)
-        {
-            return true;
-        }
-
-        throw new InvalidInstrumentationKeyException("'{$instrumentationKey}' is not a valid Microsoft Application Insights instrumentation key.");
+        $this->connectionString = null;
     }
 
     public function getFlushQueueAfterSeconds()

@@ -66,7 +66,6 @@ class AppInsightsHelpers
         \AIServer::trackRequest(
             'application',
             $request->fullUrl(),
-            $_SERVER['REQUEST_TIME_FLOAT'],
             $this->getRequestDuration(),
             $this->getResponseCode($response),
             $this->isSuccessful($response),
