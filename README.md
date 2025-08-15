@@ -17,16 +17,30 @@ Update the `require` section of your application's **composer.json** file:
 }
 ```
 
-### Instrumentation Key
+## Instrumentation Key / Connection String
 
-The package will check your application's **.env** file for your *Instrumentation Key*.
+The package will check your application's `.env` file for your **Instrumentation Key**.
 
-Add the following to your **.env** file:
+⚠ **Note:**
+`MS_INSTRUMENTATION_KEY` is **deprecated**.
+Use `MS_AI_CONNECTION_STRING` instead.
+
+### `.env` example
+
+```env
+# Old way (deprecated)
+# MS_INSTRUMENTATION_KEY=00000000-0000-0000-0000-000000000000
+
+# New way (recommended)
+MS_AI_CONNECTION_STRING=InstrumentationKey=00000000-0000-0000-0000-000000000000;IngestionEndpoint=https://<region>.in.applicationinsights.azure.com/
+```
+
+### Where to find the connection string
+
+You can get the connection string from your Azure Portal:
 
 ```
-...
-MS_INSTRUMENTATION_KEY=<your instrumentation key>
-...
+Application Insights → Overview → Connection String
 ```
 
 You can find your instrumentation key on the [Microsoft Azure Portal](https://portal.azure.com).
