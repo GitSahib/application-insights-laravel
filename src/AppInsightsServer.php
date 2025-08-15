@@ -25,6 +25,11 @@ class AppInsightsServer extends InstrumentationKey
         }
     }
 
+    public function getChannel()
+    {
+        return $this->telemetryClient;
+    }
+
     public function __call($name, $arguments)
     {
         if (isset($this->connectionString, $this->telemetryClient)) {

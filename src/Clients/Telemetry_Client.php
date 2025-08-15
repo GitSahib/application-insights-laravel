@@ -51,6 +51,31 @@ class Telemetry_Client
             $this->flush();
         });
     }
+
+    /**
+     * Sets the queue for telemetry data.
+     *
+     * @param array $data
+     * @throws AppInsightsException
+     */
+    public function setQueue(array $data)
+    {
+        if (empty($data)) {
+            \Log::error('Telemetry data cannot be empty.');
+            return;
+        }
+        $this->buffer = $data;
+    }
+
+    /**
+     * Gets the current queue of telemetry data.
+     *
+     * @return array
+     */
+    public function getQueue()
+    {
+        return $this->buffer;
+    }
     
     /**
      * Sets the connection string for the Application Insights service.
@@ -105,6 +130,19 @@ class Telemetry_Client
      */
     public function trackRequest(string $name, string $url, float $durationMs, int $responseCode, bool $success)
     {
+        $urlParts = parse_url($url);
+
+        $baseUrl = ($urlParts['scheme'] ?? '') . '://' .
+               ($urlParts['host'] ?? '') .
+               ($urlParts['path'] ?? '');
+        // Query parameters (array)
+        $queryParams = [];
+        if (!empty($urlParts['query'])) {
+            parse_str($urlParts['query'], $queryParams);
+        }
+
+        // If you want to limit query params to max 5
+        $queryParams = array_slice($queryParams, 0, 5, true);
         $payload = [
             'name' => 'Microsoft.ApplicationInsights.Request',
             'time' => now()->toIso8601ZuluString(),
@@ -118,8 +156,18 @@ class Telemetry_Client
                     'duration' => $this->formatDuration($durationMs),
                     'responseCode' => (string) $responseCode,
                     'success' => $success,
-                    'url' => $url,
-                ]
+                    'url' => $baseUrl,
+                ],
+                'properties' => array_merge(
+                    $this->globalProperties,
+                    [
+                        'url' => $baseUrl,
+                        'query_params' => json_encode($queryParams),
+                        'duration_ms' => $durationMs,
+                        'response_code' => $responseCode,
+                        'success' => $success ? 'true' : 'false',
+                    ]
+                )
             ]
         ];
 
@@ -131,7 +179,7 @@ class Telemetry_Client
      * @param \Throwable $exception The exception to track.
      * @return void
      */
-    public function trackException(\Throwable $exception)
+    public function trackException(\Throwable $exception, $properties = [])
     {
         $payload = [
             'name' => 'Microsoft.ApplicationInsights.Exception',
@@ -148,12 +196,33 @@ class Telemetry_Client
                         'stack' => $exception->getTraceAsString(),
                     ]],
                     'severityLevel' => 3, // 0=Verbose, 1=Info, 2=Warning, 3=Error, 4=Critical
-                    'properties' => $this->globalProperties
+                    'properties' => array_merge(
+                        $this->globalProperties,
+                        $properties
+                    )
                 ]
             ]
         ];
-
+        // Log the payload before sending
         $this->sendPayload($payload);
+    }
+    /**
+     * Gets request properties from the request object.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return array
+     */
+    protected function getRequestProperties($request)
+    {
+        return [
+            'method' => $request->method(),
+            'url' => $request->fullUrl(),
+            'ip' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'session_id' => $request->session()->getId(),
+            'user_id' => optional($request->user())->id,
+            'route_name' => $request->route() ? $request->route()->getName() : null,
+        ];
     }
 
     /**
@@ -230,8 +299,16 @@ class Telemetry_Client
 
     public function flush()
     {
-        if (empty($this->buffer)) return;
+        if (empty($this->buffer)) {
+            \Log::info('AppInsights flush called but buffer is empty.');
+            return;
+        }
+        
         try {
+
+            if (config('AppInsightsLaravel.enableLocalLogging')) {
+                $this->logPayloadBeforeFlush();
+            }
 
             $response = Http::withHeaders([
                 'Content-Type' => 'application/x-ndjson',

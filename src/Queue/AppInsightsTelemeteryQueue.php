@@ -37,7 +37,7 @@ class AppInsightsTelemeteryQueue implements ShouldQueue
         }
         try 
         { 
-           \AIServer::getChannel()->setQueue($this->data);
+           \AIServer::setQueue($this->data);
            \AIServer::flush();
         }        
         catch (RequestException $e) 
