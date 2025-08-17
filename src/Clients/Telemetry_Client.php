@@ -361,7 +361,7 @@ class Telemetry_Client
         $minutes = floor(($milliseconds % 3600000) / 60000);
         $seconds = floor(($milliseconds % 60000) / 1000);
         $ms = $milliseconds % 1000;
-        \Log::info("AppInsights duration formatted: ${milliseconds} {$hours}:{$minutes}:{$seconds}.{$ms}");
+        \Log::info("AppInsights duration formatted: {$milliseconds} {$hours}:{$minutes}:{$seconds}.{$ms}");
         return sprintf('%02d:%02d:%02d.%03d', $hours, $minutes, $seconds, $ms);
     }
 
