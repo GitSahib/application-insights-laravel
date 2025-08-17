@@ -128,10 +128,9 @@ class Telemetry_Client
      * @param float $durationMs
      * @return string
      */
-    public function trackRequest(string $name, string $url, float $durationMs, int $responseCode, bool $success)
+    public function trackRequest(string $name, string $url, float $durationMs, int $responseCode, bool $success, $properties = [], $measurements = [])
     {
         $urlParts = parse_url($url);
-
         $baseUrl = ($urlParts['scheme'] ?? '') . '://' .
                ($urlParts['host'] ?? '') .
                ($urlParts['path'] ?? '');
@@ -143,6 +142,16 @@ class Telemetry_Client
 
         // If you want to limit query params to max 5
         $queryParams = array_slice($queryParams, 0, 5, true);
+        $properties = array_merge($this->globalProperties, $properties);
+        $properties['query_params'] = json_encode($queryParams);
+
+        $measurements = array_merge($measurements, [
+            'duration_ms' => $durationMs,
+            'response_code' => $responseCode,
+            'success' => $success ? 'true' : 'false',
+        ]);
+
+        // Prepare the payload
         $payload = [
             'name' => 'Microsoft.ApplicationInsights.Request',
             'time' => now()->toIso8601ZuluString(),
@@ -157,17 +166,8 @@ class Telemetry_Client
                     'responseCode' => (string) $responseCode,
                     'success' => $success,
                     'url' => $baseUrl,
-                ],
-                'properties' => array_merge(
-                    $this->globalProperties,
-                    [
-                        'url' => $baseUrl,
-                        'query_params' => json_encode($queryParams),
-                        'duration_ms' => $durationMs,
-                        'response_code' => $responseCode,
-                        'success' => $success ? 'true' : 'false',
-                    ]
-                )
+                    'properties' => $properties,
+                ]
             ]
         ];
 
