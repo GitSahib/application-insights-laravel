@@ -175,6 +175,8 @@ class Telemetry_Client
      */
     public function trackException(\Throwable $exception, $properties = [])
     {
+        $properties = $properties ?? [];
+        $properties = array_merge($this->globalProperties ?? [], $properties);
         $payload = [
             'name' => 'Microsoft.ApplicationInsights.Exception',
             'time' => now()->toIso8601ZuluString(),
@@ -190,10 +192,7 @@ class Telemetry_Client
                         'stack' => $exception->getTraceAsString(),
                     ]],
                     'severityLevel' => 3, // 0=Verbose, 1=Info, 2=Warning, 3=Error, 4=Critical
-                    'properties' => array_merge(
-                        $this->globalProperties,
-                        $properties
-                    )
+                    'properties' => $properties
                 ]
             ]
         ];
@@ -227,6 +226,8 @@ class Telemetry_Client
      */
     public function trackEvent(string $eventName, array $properties = [])
     {
+        $properties = $properties ?? [];
+        $properties = array_merge($this->globalProperties ?? [], $properties);
         $payload = [
             'name' => 'Microsoft.ApplicationInsights.Event',
             'time' => now()->toIso8601ZuluString(),
@@ -236,7 +237,7 @@ class Telemetry_Client
                 'baseData' => [
                     'ver' => 2,
                     'name' => $eventName,
-                    'properties' => array_merge($this->globalProperties, $properties)
+                    'properties' => $properties
                 ]
             ]
         ];
@@ -264,6 +265,8 @@ class Telemetry_Client
      */
     public function trackTrace(string $message, int $severity = 1, array $properties = [])
     {
+        $properties = $properties ?? [];
+        $properties = array_merge($this->globalProperties ?? [], $properties);
         $payload = [
             'name' => 'Microsoft.ApplicationInsights.Message',
             'time' => now()->toIso8601ZuluString(),
@@ -274,7 +277,7 @@ class Telemetry_Client
                     'ver' => 2,
                     'message' => $message,
                     'severityLevel' => $severity,
-                    'properties' => array_merge($this->globalProperties, $properties)
+                    'properties' => $properties
                 ]
             ]
         ];
