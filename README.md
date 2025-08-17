@@ -1,9 +1,9 @@
 # Microsoft Application Insights for Laravel 10
+A simple Laravel integration for Microsoft Application Insights
 
-A simple Laravel implementation for [Microsoft Application Insights](http://azure.microsoft.com/en-gb/services/application-insights/)
+This package was originally inspired by provisions-group/ms-application-insights-laravel. That package was built for Laravel 5 and is no longer maintained.
 
-This package is based on https://github.com/provisions-group/ms-application-insights-laravel
-The above package was for laravel 5 and had no updates so we started a new one for laravel 10 with some extra features for example queuing and handling api and web guards differently
+This package is a fully maintained, standalone implementation for Laravel 10+, updated to support the latest Application Insights requirements. It provides a clean way to push telemetry from your Laravel web app and APIs directly to Application Insights, with additional features such as queue support and separate handling for API and web guards.
 
 ## Installation
 
