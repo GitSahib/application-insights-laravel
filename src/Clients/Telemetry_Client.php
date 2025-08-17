@@ -119,7 +119,7 @@ class Telemetry_Client
      */
     public function setGlobalProperties(array $properties)
     {
-        $this->globalProperties = $properties;
+        $this->globalProperties = $properties ?? [];
     }
 
     /**
@@ -142,15 +142,9 @@ class Telemetry_Client
 
         // If you want to limit query params to max 5
         $queryParams = array_slice($queryParams, 0, 5, true);
+        $properties = $properties ?? [];
         $properties = array_merge($this->globalProperties, $properties);
         $properties['query_params'] = json_encode($queryParams);
-
-        $measurements = array_merge($measurements, [
-            'duration_ms' => $durationMs,
-            'response_code' => $responseCode,
-            'success' => $success ? 'true' : 'false',
-        ]);
-
         // Prepare the payload
         $payload = [
             'name' => 'Microsoft.ApplicationInsights.Request',
