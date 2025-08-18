@@ -33,8 +33,8 @@ class InstrumentationKey
         $this->connectionString = null;
     }
 
-    public function getFlushQueueAfterSeconds()
+    public function getFlushQueueAfterSeconds(): int
     {
-        return $this->flushQueueAfterSeconds ?? 0;
+        return intval($this->flushQueueAfterSeconds ?? 0);
     }
 }
