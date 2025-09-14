@@ -40,6 +40,7 @@ class AppInsightsHelpers
         }
 
         $properties = $this->getPageViewProperties($request);
+        /** @disregard Undefined type 'AIServer' */
         \AIServer::trackMessage('browse_duration', $properties);
         $this->flush();
         
@@ -62,7 +63,7 @@ class AppInsightsHelpers
         {
             return;
         }
-        
+        /** @disregard Undefined type 'AIServer' */
         \AIServer::trackRequest(
             'application',
             $request->fullUrl(),
@@ -86,6 +87,7 @@ class AppInsightsHelpers
         {
             return;
         }
+        /** @disregard Undefined type 'AIServer' */
         \AIServer::trackException($e, $this->getRequestPropertiesFromException($e));
         $this->flush();
     }
@@ -99,6 +101,7 @@ class AppInsightsHelpers
         $queue_seconds = $this->appInsights->getFlushQueueAfterSeconds();
         if($queue_seconds)
         {
+            /** @disregard Undefined type 'AIServer' */
             \AIQueue::dispatch(\AIServer::getQueue())
             ->delay(now()->addSeconds($queue_seconds));
         }
@@ -106,13 +109,10 @@ class AppInsightsHelpers
         {
             try 
             {  
+                /** @disregard Undefined type 'AIServer' */
                \AIServer::flush();
-            }        
-            catch (RequestException $e) 
-            {
-                Log::debug('RequestException: Could not flush AIServer server. Error:'.$e->getMessage());
             }
-            catch(Exception $e)
+            catch(\Exception $e)
             {
                 Log::debug('Exception: Could not flush AIServer server. Error:'.$e->getMessage());
             }
@@ -134,6 +134,8 @@ class AppInsightsHelpers
             {
                 foreach ($item['args'] as $arg)
                 {
+                    
+                    /** @disregard Undefined type 'Request' */ 
                     if ($arg instanceof Request)
                     {
                         return $this->getRequestProperties($arg);
@@ -340,6 +342,7 @@ class AppInsightsHelpers
      */
     private function getResponseCode($response)
     {
+        /** @disregard Undefined type 'StreamedResponse' */ 
         return $response instanceof StreamedResponse ? $response->getStatusCode() : $response->status();
     }
 }

@@ -1,7 +1,12 @@
 <?php
 namespace Larasahib\AppInsightsLaravel\Clients;
 use Larasahib\AppInsightsLaravel\Exceptions\AppInsightsException;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
+use Larasahib\AppInsightsLaravel\Support\Config;
+use Larasahib\AppInsightsLaravel\Support\Logger;
 use Illuminate\Support\Facades\Http;
+
 class Telemetry_Client
 {
     
@@ -48,7 +53,9 @@ class Telemetry_Client
     {
         // Flush at script end
         register_shutdown_function(function () {
-            $this->flush();
+            if(count($this->buffer) > $this->bufferLimit){
+                $this->flush();
+            }
         });
     }
 
@@ -61,10 +68,19 @@ class Telemetry_Client
     public function setQueue(array $data)
     {
         if (empty($data)) {
-            \Log::error('Telemetry data cannot be empty.');
+            Log::error('Telemetry data cannot be empty.');
             return;
         }
-        $this->buffer = $data;
+        
+        if($this->buffer === null) {
+            $this->buffer = [];
+        }
+
+        array_push($this->buffer, ...$data);
+
+        if(count($this->buffer) >= $this->bufferLimit) {
+            $this->flush(); // Auto-flush
+        }
     }
 
     /**
@@ -85,6 +101,9 @@ class Telemetry_Client
      */ 
     public function setConnectionString($connectionString)
     {
+        if(Config::get('enable_local_logging', false)){
+            Log::debug('AI Setting ConnString to ', ['payload' => $connectionString]);
+        }
         if (!empty($connectionString))
         {
             $this->connectionString = $connectionString;
@@ -148,7 +167,7 @@ class Telemetry_Client
         // Prepare the payload
         $payload = [
             'name' => 'Microsoft.ApplicationInsights.Request',
-            'time' => now()->toIso8601ZuluString(),
+            'time' => Carbon::now()->toIso8601ZuluString(),
             'iKey' => $this->instrumentationKey,
             'data' => [
                 'baseType' => 'RequestData',
@@ -177,9 +196,19 @@ class Telemetry_Client
     {
         $properties = $properties ?? [];
         $properties = array_merge($this->globalProperties ?? [], $properties);
+        $trace = array_map(function ($frame, $index) {
+            return [
+                'level' => $index,
+                'method' => ($frame['class'] ?? '') . ($frame['type'] ?? '') . ($frame['function'] ?? ''),
+                'assembly' => $frame['class'] ?? '',
+                'fileName' => $frame['file'] ?? null,
+                'line' => $frame['line'] ?? null,
+            ];
+        }, $exception->getTrace(), array_keys($exception->getTrace()));
+        
         $payload = [
             'name' => 'Microsoft.ApplicationInsights.Exception',
-            'time' => now()->toIso8601ZuluString(),
+            'time' => Carbon::now()->toIso8601ZuluString(),
             'iKey' => $this->instrumentationKey,
             'data' => [
                 'baseType' => 'ExceptionData',
@@ -189,7 +218,7 @@ class Telemetry_Client
                         'typeName' => get_class($exception),
                         'message' => $exception->getMessage(),
                         'hasFullStack' => true,
-                        'stack' => $exception->getTraceAsString(),
+                        'parsedStack' => $trace,
                     ]],
                     'severityLevel' => 3, // 0=Verbose, 1=Info, 2=Warning, 3=Error, 4=Critical
                     'properties' => $properties
@@ -213,7 +242,7 @@ class Telemetry_Client
             'ip' => $request->ip(),
             'user_agent' => $request->userAgent(),
             'session_id' => $request->session()->getId(),
-            'user_id' => optional($request->user())->id,
+            'user_id' => $request->user()?->id,
             'route_name' => $request->route() ? $request->route()->getName() : null,
         ];
     }
@@ -230,7 +259,7 @@ class Telemetry_Client
         $properties = array_merge($this->globalProperties ?? [], $properties);
         $payload = [
             'name' => 'Microsoft.ApplicationInsights.Event',
-            'time' => now()->toIso8601ZuluString(),
+            'time' => Carbon::now()->toIso8601ZuluString(),
             'iKey' => $this->instrumentationKey,
             'data' => [
                 'baseType' => 'EventData',
@@ -269,7 +298,7 @@ class Telemetry_Client
         $properties = array_merge($this->globalProperties ?? [], $properties);
         $payload = [
             'name' => 'Microsoft.ApplicationInsights.Message',
-            'time' => now()->toIso8601ZuluString(),
+            'time' => Carbon::now()->toIso8601ZuluString(),
             'iKey' => $this->instrumentationKey,
             'data' => [
                 'baseType' => 'MessageData',
@@ -288,7 +317,9 @@ class Telemetry_Client
     protected function sendPayload(array $payload)
     {
         $this->buffer[] = $payload;
-
+        if(Config::get('enable_local_logging', false)){
+            Log::debug('Added payload to buffer', ['payload' => $payload]);
+        }
         if (count($this->buffer) >= $this->bufferLimit) {
             $this->flush(); // Auto-flush
         }
@@ -296,50 +327,60 @@ class Telemetry_Client
 
     public function flush()
     {
-        if (empty($this->buffer)) {
-            \Log::info('AppInsights flush called but buffer is empty.');
+        $enableLocalLogging = false;
+        try {
+            $enableLocalLogging = Config::get('enable_local_logging', false);
+        } catch (\Throwable $e) {
+            if (function_exists('logger')) {
+                Logger::error('AppInsights flush failed: ' . $e->getMessage());
+            }
+        }
+        if (empty($this->buffer) && $enableLocalLogging) {
+             Logger::debug('empty buffer response', ['body' => 'No data to send']);
             return;
         }
-        
+
         try {
 
-            if (config('AppInsightsLaravel.enableLocalLogging')) {
+            if ($enableLocalLogging) {
                 $this->logPayloadBeforeFlush();
             }
 
             $response = Http::withHeaders([
                 'Content-Type' => 'application/x-ndjson',
             ])->withBody(
-                $this->formatBatchPayload(), // returns a raw string with "\n" between JSON objects
+                $this->formatBatchPayload(),
                 'application/x-ndjson'
             )->post($this->baseUrl . '/v2/track', [
                 'iKey' => $this->instrumentationKey,
             ]);
-            
-            // Log the successful flush
-            if (config('AppInsightsLaravel.enableLocalLogging')) {
-                \Log::debug('Raw AppInsights response', ['body' => $response->body()]);
+
+            if ($enableLocalLogging && function_exists('logger')) {
+                Logger::debug('Raw AppInsights response', ['body' => $response->body()]);
             }
-            
-            // Clear buffer after successful send
+
             $this->buffer = [];
-        } catch (\Exception $e) {
-            \Log::error('AppInsights flush failed: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            if (function_exists('logger')) {
+                Logger::error('AppInsights flush failed: ' . $e->getMessage());
+            }
+            // else swallow silently during shutdown
         }
     }
 
+
     protected function logPayloadBeforeFlush()
     {
-        \Log::debug("AppInsights Payload Posting to", ['url' => $this->baseUrl . '/v2/track']);
+        Log::debug("AppInsights Payload Posting to", ['url' => $this->baseUrl . '/v2/track']);
         foreach ($this->buffer as $index => $item) {
-            \Log::debug("AppInsights Payload [{$index}]", ['json' => json_encode($item)]);
+            Log::debug("AppInsights Payload [{$index}]", ['json' => json_encode($item)]);
         }
 
         try {
             $ndjson = $this->formatBatchPayload();
-            \Log::debug("AppInsights NDJSON Payload", ['ndjson' => $ndjson]);
+            Log::debug("AppInsights NDJSON Payload", ['ndjson' => $ndjson]);
         } catch (\Throwable $e) {
-            \Log::error("Failed to format AppInsights NDJSON payload: " . $e->getMessage());
+            Log::error("Failed to format AppInsights NDJSON payload: " . $e->getMessage());
         }
     }
 
@@ -361,7 +402,9 @@ class Telemetry_Client
         $minutes = floor(($milliseconds % 3600000) / 60000);
         $seconds = floor(($milliseconds % 60000) / 1000);
         $ms = $milliseconds % 1000;
-        \Log::info("AppInsights duration formatted: {$milliseconds} {$hours}:{$minutes}:{$seconds}.{$ms}");
+        if (Config::get('enableLocalLogging', false)){
+            Log::info("AppInsights duration formatted: {$milliseconds} {$hours}:{$minutes}:{$seconds}.{$ms}");
+        }
         return sprintf('%02d:%02d:%02d.%03d', $hours, $minutes, $seconds, $ms);
     }
 

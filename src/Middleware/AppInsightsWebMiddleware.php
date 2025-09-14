@@ -3,7 +3,7 @@ namespace Larasahib\AppInsightsLaravel\Middleware;
 
 use Closure;
 use Larasahib\AppInsightsLaravel\AppInsightsHelpers;
-
+use Larasahib\AppInsightsLaravel\Support\Logger;
 class AppInsightsWebMiddleware
 {
 
@@ -30,11 +30,19 @@ class AppInsightsWebMiddleware
      */
     public function handle($request, Closure $next)
     {
-        $this->appInsightsHelpers->trackPageViewDuration($request);
+        try {
+            $this->appInsightsHelpers->trackPageViewDuration($request);
+        } catch (\Throwable $e) {
+            Logger::error('AppInsightsWebMiddleware trackPageViewDuration error: ' . $e->getMessage(), ['exception' => $e]);
+        }
 
         $response = $next($request);
 
-        $this->appInsightsHelpers->flashPageInfo($request);
+        try {
+            $this->appInsightsHelpers->flashPageInfo($request);
+        } catch (\Throwable $e) {
+            Logger::error('AppInsightsWebMiddleware flashPageInfo error: ' . $e->getMessage(), ['exception' => $e]);
+        }
 
         return $response;
     }
@@ -46,7 +54,11 @@ class AppInsightsWebMiddleware
      */
     public function terminate($request, $response)
     {
-        $this->appInsightsHelpers->trackRequest($request, $response);
+        try {
+            $this->appInsightsHelpers->trackRequest($request, $response);
+        } catch (\Throwable $e) {
+            Logger::error('AppInsightsWebMiddleware telemetry error: ' . $e->getMessage(), ['exception' => $e]);
+        }
     }
 
 }
