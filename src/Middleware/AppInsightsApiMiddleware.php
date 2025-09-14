@@ -3,6 +3,7 @@ namespace Larasahib\AppInsightsLaravel\Middleware;
 
 use Closure;
 use Larasahib\AppInsightsLaravel\AppInsightsHelpers;
+use Larasahib\AppInsightsLaravel\Support\Logger;
 
 class AppInsightsApiMiddleware
 {
@@ -40,7 +41,12 @@ class AppInsightsApiMiddleware
      */
     public function terminate($request, $response)
     {
-        $this->appInsightsHelpers->trackRequest($request, $response);
+        try {
+            $this->appInsightsHelpers->trackRequest($request, $response);
+        } catch (\Throwable $e) {
+            Logger::error('AppInsightsApiMiddleware telemetry error: ' . $e->getMessage(), ['exception' => $e]);
+            // Optionally cache or handle error here
+        }
     }
 
 }

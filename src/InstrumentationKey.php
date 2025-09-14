@@ -1,7 +1,7 @@
 <?php
 namespace Larasahib\AppInsightsLaravel;
-
-use Larasahib\AppInsightsLaravel\Exceptions\InvalidInstrumentationKeyException;
+use Illuminate\Support\Facades\Log;
+use Larasahib\AppInsightsLaravel\Support\Config;
 
 class InstrumentationKey
 {
@@ -16,17 +16,17 @@ class InstrumentationKey
 
     protected function setConnectionString()
     {
-        $this->flushQueueAfterSeconds = config('AppInsightsLaravel.flushQueueAfterSeconds');
-        $this->instrumentationKey = config('AppInsightsLaravel.instrumentationKey');
+        $this->flushQueueAfterSeconds = Config::get('flush_queue_after_seconds');
+        $this->instrumentationKey = Config::get('instrumentation_key');
 
-        $connectionString = config('AppInsightsLaravel.connectionString');
+        $connectionString = Config::get('connection_string');
         if (!empty($connectionString)) {
             $this->connectionString = $connectionString;
             return;
         }
         else if (!empty($this->instrumentationKey)) {
             //deprecated
-            \Log::warning('Set MS_AI_CONNECTION_STRING in your .env file to use connection string instead of instrumentation key.');
+            Log::warning('Set MS_AI_CONNECTION_STRING in your .env file to use connection string instead of instrumentation key.');
             return;
         }
 

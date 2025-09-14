@@ -7,6 +7,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use GuzzleHttp\Exception\RequestException;
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 class AppInsightsTelemeteryQueue implements ShouldQueue
@@ -37,8 +38,8 @@ class AppInsightsTelemeteryQueue implements ShouldQueue
         }
         try 
         { 
+           /** @disregard Undefined type 'AIServer' */
            \AIServer::setQueue($this->data);
-           \AIServer::flush();
         }        
         catch (RequestException $e) 
         {

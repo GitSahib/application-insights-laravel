@@ -4,7 +4,8 @@ use Larasahib\AppInsightsLaravel\AppInsightsHelpers;
 use Throwable;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-
+use Larasahib\AppInsightsLaravel\Support\Logger;
+ /** @disregard Undefined type 'ExceptionHandler' */
 class AppInsightsExceptionHandler extends ExceptionHandler
 {
     /**
@@ -15,6 +16,7 @@ class AppInsightsExceptionHandler extends ExceptionHandler
 
     public function __construct(AppInsightsHelpers $appInsightsHelpers, Container $container)
     {
+        /** @disregard Undefined type 'parent' */
         parent::__construct($container);
         $this->appInsightsHelpers = $appInsightsHelpers;        
     }
@@ -27,8 +29,13 @@ class AppInsightsExceptionHandler extends ExceptionHandler
      * @return void
      */
     public function report(Throwable $e)
-    { 
-        $this->appInsightsHelpers->trackException($e);
+    {
+        try {
+            $this->appInsightsHelpers->trackException($e);
+        } catch (\Throwable $ex) {
+            Logger::error('AppInsightsExceptionHandler telemetry error: ' . $ex->getMessage(), ['exception' => $ex]);
+        }
+        /** @disregard Undefined type 'parent' */
         return parent::report($e);
     }
 }

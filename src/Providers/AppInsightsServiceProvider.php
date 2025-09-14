@@ -3,8 +3,8 @@
 namespace Larasahib\AppInsightsLaravel\Providers;
 
 use Larasahib\AppInsightsLaravel\Clients\Telemetry_Client;
+use Laravel\Lumen\Application as LumenApplication;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
-use Larasahib\AppInsightsLaravel\Queue\AppInsightsTelemeteryQueue;
 use Larasahib\AppInsightsLaravel\Middleware\AppInsightsWebMiddleware;
 use Larasahib\AppInsightsLaravel\Middleware\AppInsightsApiMiddleware;
 use Larasahib\AppInsightsLaravel\AppInsightsClient;
@@ -73,10 +73,20 @@ class AppInsightsServiceProvider extends LaravelServiceProvider {
 
     private function handleConfigs() {
 
-        $configPath = __DIR__ . '/../../config/AppInsightsLaravel.php';
+        $configPath = $this->getConfigFile();
 
-        $this->publishes([$configPath => config_path('AppInsightsLaravel.php')]);
+        $this->publishes([
+            $configPath => $this->app->configPath('appinsights-laravel.php'),
+        ], 'config');
 
-        $this->mergeConfigFrom($configPath, 'AppInsightsLaravel');
+        $this->mergeConfigFrom($configPath, 'appinsights-laravel');
+    }
+
+    /**
+     * @return string
+     */
+    protected function getConfigFile(): string
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'AppInsightsLaravel.php';
     }
 }
