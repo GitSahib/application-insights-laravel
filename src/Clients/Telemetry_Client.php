@@ -159,10 +159,11 @@ class Telemetry_Client
             parse_str($urlParts['query'], $queryParams);
         }
 
-        // If you want to limit query params to max 5
-        $queryParams = array_slice($queryParams, 0, 5, true);
+        $max_params = Config::get('max_query_params', 10);
+        $queryParams = array_slice($queryParams, 0, $max_params, true);
         $properties = $properties ?? [];
         $properties = array_merge($this->globalProperties, $properties);
+        $properties['fullUrl'] = $baseUrl;
         $properties['query_params'] = json_encode($queryParams);
         // Prepare the payload
         $payload = [
@@ -188,24 +189,57 @@ class Telemetry_Client
     }
 
     /**
+     * Tracks a JavaScript exception sent from the client side.
+     *
+     * @param array $data
+     * @return void
+     */
+    public function trackExceptionFromArray(array $data)
+    {
+        $message = $data['message'] ?? 'Unknown JS error';
+        $jsStack = $data['stack'] ?? null;
+
+        // Keep JS details in properties
+        $properties = [
+            'filename' => $data['filename'] ?? null,
+            'lineno' => $data['lineno'] ?? null,
+            'colno' => $data['colno'] ?? null,
+            'jsStack' => $jsStack,
+        ];
+
+        // Merge any additional properties
+        if (isset($data['properties']) && is_array($data['properties'])) {
+            $properties = array_merge($properties, $data['properties']);
+        }
+
+        $ex = new \Exception($message);
+
+        // Send exception including JS stack
+        $this->trackException($ex, $properties, $jsStack);
+    }
+
+
+    /**
      * Tracks an exception with the Application Insights service.
      * @param \Throwable $exception The exception to track.
      * @return void
      */
-    public function trackException(\Throwable $exception, $properties = [])
+    public function trackException(\Throwable $exception, array $properties = [], ?string $overrideStack = null)
     {
         $properties = $properties ?? [];
         $properties = array_merge($this->globalProperties ?? [], $properties);
-        $trace = array_map(function ($frame, $index) {
-            return [
-                'level' => $index,
-                'method' => ($frame['class'] ?? '') . ($frame['type'] ?? '') . ($frame['function'] ?? ''),
-                'assembly' => $frame['class'] ?? '',
-                'fileName' => $frame['file'] ?? null,
-                'line' => $frame['line'] ?? null,
-            ];
-        }, $exception->getTrace(), array_keys($exception->getTrace()));
-        
+        $trace = $overrideStack
+            ? [['level' => 0, 'method' => 'JS', 'assembly' => 'JS', 'stack' => $overrideStack]]
+            : array_map(function ($frame, $index) {
+                return [
+                    'level' => $index,
+                    'method' => ($frame['class'] ?? '') . ($frame['type'] ?? '') . ($frame['function'] ?? ''),
+                    'assembly' => $frame['class'] ?? '',
+                    'fileName' => $frame['file'] ?? null,
+                    'line' => $frame['line'] ?? null,
+                ];
+            }, $exception->getTrace(), array_keys($exception->getTrace()));
+
         $payload = [
             'name' => 'Microsoft.ApplicationInsights.Exception',
             'time' => Carbon::now()->toIso8601ZuluString(),
@@ -225,7 +259,7 @@ class Telemetry_Client
                 ]
             ]
         ];
-        // Log the payload before sending
+
         $this->sendPayload($payload);
     }
     /**
@@ -245,6 +279,20 @@ class Telemetry_Client
             'user_id' => $request->user()?->id,
             'route_name' => $request->route() ? $request->route()->getName() : null,
         ];
+    }
+
+    /**
+     * Tracks a custom event sent from the client side.
+     *
+     * @param array $data
+     * @return void
+     */
+    public function trackEventFromArray(array $data)
+    {
+        $name = $data['name'] ?? 'unknown_event';
+        $properties = $data['properties'] ?? [];
+
+        $this->trackEvent($name, $properties);
     }
 
     /**

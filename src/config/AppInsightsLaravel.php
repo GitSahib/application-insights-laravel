@@ -19,5 +19,6 @@ return [
     'flush_queue_after_seconds' => env('MS_AI_FLUSH_QUEUE_AFTER_SECONDS', 0),
     'enable_local_logging' => env('MS_AI_ENABLE_LOGGING', 0),
     'connection_string' => env('MS_AI_CONNECTION_STRING', null),
+    'max_query_params' => env('MS_AI_MAX_QUERY_PARAMS', 10),
 
 ];

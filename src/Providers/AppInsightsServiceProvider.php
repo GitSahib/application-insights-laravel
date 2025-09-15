@@ -74,12 +74,35 @@ class AppInsightsServiceProvider extends LaravelServiceProvider {
     private function handleConfigs() {
 
         $configPath = $this->getConfigFile();
+        $routesPath = $this->getRoutesFile(); 
 
         $this->publishes([
             $configPath => $this->app->configPath('appinsights-laravel.php'),
         ], 'config');
 
+        $this->publishes([
+            $this->getAssetsPath("js") => public_path('vendor/app-insights-laravel/js'),
+        ], 'laravel-assets');
+
+        $this->loadRoutesFrom($routesPath);
+
         $this->mergeConfigFrom($configPath, 'appinsights-laravel');
+        
+    }
+
+    /**
+     * @return string
+     */
+    private function getAssetsPath(string $path): string
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . $path;
+    }
+    /**
+     * @return string
+     */
+    protected function getRoutesFile(): string
+    {
+        return __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'routes' . DIRECTORY_SEPARATOR . 'web.php';
     }
 
     /**

@@ -121,8 +121,33 @@ If you want to use any of the underlying [ApplicationInsights-PHP](https://githu
 \AIQueue::dispatch(\AIServer::getChannel()->getQueue())->delay(now()->addSeconds(3));//use laravel queue to send data later
 ...
 ```
+---
+---
+## Publishing the Package Configuration and Assets
 
-See the [ApplicationInsights-PHP](https://github.com/Microsoft/ApplicationInsights-PHP) page for more information on the available methods.
+After installing the package, you need to publish the configuration file and JavaScript assets so your application can use them:
+
+1. **Publish the configuration:**
+
+```bash
+php artisan vendor:publish --tag=config
+```
+
+This will copy the `AppInsightsLaravel.php` configuration file to your app’s `config` folder.
+
+### 2. **Publish the JavaScript assets**
+
+Although Laravel 10+ users will have the assets automatically available after install or update via Composer, you can also manually publish them if needed:
+
+```bash
+php artisan vendor:publish --tag=laravel-assets
+```
+
+This ensures the JS file is copied to your `public/vendor/appinsights/js` folder and ready to be loaded by the client. 
+
+  > **Tip:** Add `--force` to overwrite existing files if needed.
+  
+---
 
 ### 📦 Version History
 
@@ -164,7 +189,7 @@ See the [ApplicationInsights-PHP](https://github.com/Microsoft/ApplicationInsigh
 
 #### 📦 **1.0.5**
 
-* Fixed service provider registration issues in Laravel 10.
+* Fixed service provider registration issues in Laravel 12.
 * Added support for Laravel's `config:cache`.
 
 ---
@@ -190,3 +215,43 @@ See the [ApplicationInsights-PHP](https://github.com/Microsoft/ApplicationInsigh
 * ✅ Removed reliance on outdated or unsupported packages.
 * ✅ Maintained backward compatibility with existing service provider and class interfaces.
 * 🧪 Enhanced logging and error handling for production robustness.
+
+---
+
+#### 🚀 **1.1.8**
+
+* ✅ **Introduced auto-publishable JavaScript assets** (`appinsights-client.js`) for client-side telemetry.
+
+* ✅ **Improved client-side telemetry integration**: Use `AppInsightsClient::javascript()` to include the JS in your pages.
+
+* ✅ **Backend telemetry endpoint** included to receive telemetry data sent from the JS.
+
+* 📝 **New setup instructions**:
+
+  1. **Publish the configuration file**:
+
+  ```bash
+  php artisan vendor:publish --tag=config
+  ```
+---
+
+### 2. **Publish the JavaScript assets**
+
+Although Laravel 10+ users will have the assets automatically available after install or update via Composer, you can also manually publish them if needed:
+
+```bash
+php artisan vendor:publish --tag=laravel-assets
+```
+
+This ensures the JS file is copied to your `public/vendor/appinsights/js` folder and ready to be loaded by the client. 
+
+  > **Tip:** Add `--force` to overwrite existing files if needed.
+
+* ✅ **Maintained backward compatibility** with Laravel 10+ and previous package versions.
+
+* 🧪 **Improved logging and error handling** for both server-side and client-side telemetry.
+
+* 🛠 Minor bug fixes and internal refactors.
+
+---
+
