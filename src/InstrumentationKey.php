@@ -26,7 +26,7 @@ class InstrumentationKey
         }
         else if (!empty($this->instrumentationKey)) {
             //deprecated
-            Log::warning('Set MS_AI_CONNECTION_STRING in your .env file to use connection string instead of instrumentation key.');
+            Log::warning('Using instrumentation_key is deprecated, please use connection string by setting MS_AI_CONNECTION_STRING in your .env file to use connection string instead of instrumentation key.');
             return;
         }
 

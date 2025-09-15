@@ -63,14 +63,15 @@ class AppInsightsHelpers
         {
             return;
         }
+        $properties = $this->getRequestProperties($request);
         /** @disregard Undefined type 'AIServer' */
         \AIServer::trackRequest(
-            'application',
+            $properties['route'] ?? 'application',
             $request->fullUrl(),
             $this->getRequestDuration(),
             $this->getResponseCode($response),
             $this->isSuccessful($response),
-            $this->getRequestProperties($request),
+            $properties,
             $this->getRequestMeasurements($request, $response)
         );
         $this->flush();
