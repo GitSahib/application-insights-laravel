@@ -1,4 +1,4 @@
-# Microsoft Application Insights for Laravel 10
+# Microsoft Application Insights for Laravel 10+
 A simple Laravel integration for Microsoft Application Insights
 
 This package was originally inspired by provisions-group/ms-application-insights-laravel. That package was built for Laravel 5 and is no longer maintained.
