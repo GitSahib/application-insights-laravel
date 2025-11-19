@@ -64,6 +64,7 @@ class AppInsightsController extends Controller
         {
             /** @disregard Undefined type 'AIServer' */
             \AIQueue::dispatch(\AIServer::getQueue())
+            ->onQueue('appinsights-queue')
             ->delay(Carbon::now()->addSeconds($queue_seconds));
         }
         else

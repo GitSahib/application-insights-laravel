@@ -1,6 +1,7 @@
 <?php
 namespace Larasahib\AppInsightsLaravel;
 
+use Carbon\Carbon;
 use Throwable;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
@@ -89,7 +90,7 @@ class AppInsightsHelpers
             return;
         }
         /** @disregard Undefined type 'AIServer' */
-        \AIServer::trackException($e, $this->getRequestPropertiesFromException($e));
+        \AIServer::trackException($e, $this->getRequestPropertiesFromException($e) ?? []);
         $this->flush();
     }
 
@@ -104,7 +105,8 @@ class AppInsightsHelpers
         {
             /** @disregard Undefined type 'AIServer' */
             \AIQueue::dispatch(\AIServer::getQueue())
-            ->delay(now()->addSeconds($queue_seconds));
+            ->onQueue('appinsights-queue')
+            ->delay(Carbon::now()->addSeconds($queue_seconds));
         }
         else
         {
