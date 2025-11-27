@@ -31,7 +31,7 @@ class AppInsightsExceptionHandler extends ExceptionHandler
     public function report(Throwable $e)
     {
         try {
-            $this->appInsightsHelpers->trackException($e);
+            $this->appInsightsHelpers->trackException($e, []);
         } catch (\Throwable $ex) {
             Logger::error('AppInsightsExceptionHandler telemetry error: ' . $ex->getMessage(), ['exception' => $ex]);
         }

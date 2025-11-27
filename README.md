@@ -226,6 +226,10 @@ This ensures the JS file is copied to your `public/vendor/appinsights/js` folder
 
 * ✅ **Backend telemetry endpoint** included to receive telemetry data sent from the JS.
 
+### **1.1.9**
+
+* ✅ **Adde appinsights-queue to add onto this queue when AI jobs are queued
+
 * 📝 **New setup instructions**:
 
   1. **Publish the configuration file**:
@@ -243,6 +247,11 @@ Although Laravel 10+ users will have the assets automatically available after in
 php artisan vendor:publish --tag=laravel-assets
 ```
 
+### 3. **Run a separate worker for only processin AI jobs 
+```bash
+php artisan queue:work --queue=appinsights-queue
+```
+
 This ensures the JS file is copied to your `public/vendor/appinsights/js` folder and ready to be loaded by the client. 
 
   > **Tip:** Add `--force` to overwrite existing files if needed.
@@ -254,4 +263,5 @@ This ensures the JS file is copied to your `public/vendor/appinsights/js` folder
 * 🛠 Minor bug fixes and internal refactors.
 
 ---
+
 
