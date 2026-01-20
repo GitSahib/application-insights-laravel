@@ -12,7 +12,7 @@ Update the `require` section of your application's **composer.json** file:
 ```js
 "require": {
 	...
-	"larasahib/application-insights-laravel": "1.0.4",
+	"larasahib/application-insights-laravel": "1.2.0",
 	...
 }
 ```
@@ -261,6 +261,15 @@ This ensures the JS file is copied to your `public/vendor/appinsights/js` folder
 * 🧪 **Improved logging and error handling** for both server-side and client-side telemetry.
 
 * 🛠 Minor bug fixes and internal refactors.
+
+## Release Notes
+
+### v1.2.0 (January 19, 2026)
+- **Production Reporting Fix:** Fixed an issue where exceptions were not reported when the application was in production mode.
+- **Centralized Logging:** Refactored logging to use a centralized `Logger` class that respects the `enable_local_logging` configuration.
+- **Improved Exception Tracing:** Updated `trackException` to properly capture and merge request context and custom properties.
+- **Stability Enhancements:** Improved robustness of the telemetry flush mechanism and fixed potential runtime exceptions related to missing configuration.
+- **Cleanup:** Removed redundant logging and improved code readability.
 
 ---
 

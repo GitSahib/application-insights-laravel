@@ -81,16 +81,18 @@ class AppInsightsHelpers
     /**
      * Track application exceptions
      *
-     * @param Exception $e
+     * @param Throwable $e
+     * @param array $properties
      */
-    public function trackException(Throwable $e)
+    public function trackException(Throwable $e, array $properties = [])
     {
         if (!$this->telemetryEnabled()) 
         {
             return;
         }
+        $properties = array_merge($this->getRequestPropertiesFromException($e) ?? [], $properties);
         /** @disregard Undefined type 'AIServer' */
-        \AIServer::trackException($e, $this->getRequestPropertiesFromException($e) ?? []);
+        \AIServer::trackException($e, $properties);
         $this->flush();
     }
 

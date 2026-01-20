@@ -40,7 +40,7 @@ class AppInsightsServer extends InstrumentationKey
     public function __call($name, $arguments)
     {
         try {
-            if (isset($this->connectionString, $this->telemetryClient)) {
+            if (isset($this->telemetryClient)) {
                 return call_user_func_array([&$this->telemetryClient, $name], $arguments);
             }
         } catch (\Throwable $e) {
