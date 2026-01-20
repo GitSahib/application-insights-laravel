@@ -68,7 +68,7 @@ class Telemetry_Client
     public function setQueue(array $data)
     {
         if (empty($data)) {
-            Log::error('Telemetry data cannot be empty.');
+            Logger::error('Telemetry data cannot be empty.');
             return;
         }
         
@@ -101,9 +101,7 @@ class Telemetry_Client
      */ 
     public function setConnectionString($connectionString)
     {
-        if(Config::get('enable_local_logging', false)){
-            Log::debug('AI Setting ConnString to ', ['payload' => $connectionString]);
-        }
+        Logger::debug('AI Setting ConnString to ', ['payload' => $connectionString]);
         if (!empty($connectionString))
         {
             $this->connectionString = $connectionString;
@@ -365,9 +363,7 @@ class Telemetry_Client
     protected function sendPayload(array $payload)
     {
         $this->buffer[] = $payload;
-        if(Config::get('enable_local_logging', false)){
-            Log::debug('Added payload to buffer', ['payload' => $payload]);
-        }
+        Logger::debug('Added payload to buffer', ['payload' => $payload]);
         if (count($this->buffer) >= $this->bufferLimit) {
             $this->flush(); // Auto-flush
         }
@@ -375,24 +371,17 @@ class Telemetry_Client
 
     public function flush()
     {
-        $enableLocalLogging = false;
-        try {
-            $enableLocalLogging = Config::get('enable_local_logging', false);
-        } catch (\Throwable $e) {
-            if (function_exists('logger')) {
-                Logger::error('AppInsights flush failed: ' . $e->getMessage());
-            }
-        }
-        if (empty($this->buffer) && $enableLocalLogging) {
-             Logger::debug('empty buffer response', ['body' => 'No data to send']);
+        if (empty($this->buffer)) {
             return;
         }
 
         try {
-
-            if ($enableLocalLogging) {
-                $this->logPayloadBeforeFlush();
+            if (empty($this->instrumentationKey)) {
+                Logger::warning('AppInsights instrumentation key is missing. Cannot flush.');
+                return;
             }
+
+            $this->logPayloadBeforeFlush();
 
             $response = Http::withHeaders([
                 'Content-Type' => 'application/x-ndjson',
@@ -403,15 +392,11 @@ class Telemetry_Client
                 'iKey' => $this->instrumentationKey,
             ]);
 
-            if ($enableLocalLogging && function_exists('logger')) {
-                Logger::debug('Raw AppInsights response', ['body' => $response->body()]);
-            }
+            Logger::debug('Raw AppInsights response', ['body' => $response->body()]);
 
             $this->buffer = [];
         } catch (\Throwable $e) {
-            if (function_exists('logger')) {
-                Logger::error('AppInsights flush failed: ' . $e->getMessage());
-            }
+            Logger::error('AppInsights flush failed: ' . $e->getMessage());
             // else swallow silently during shutdown
         }
     }
@@ -419,16 +404,16 @@ class Telemetry_Client
 
     protected function logPayloadBeforeFlush()
     {
-        Log::debug("AppInsights Payload Posting to", ['url' => $this->baseUrl . '/v2/track']);
+        Logger::debug("AppInsights Payload Posting to", ['url' => $this->baseUrl . '/v2/track']);
         foreach ($this->buffer as $index => $item) {
-            Log::debug("AppInsights Payload [{$index}]", ['json' => json_encode($item)]);
+            Logger::debug("AppInsights Payload [{$index}]", ['json' => json_encode($item)]);
         }
 
         try {
             $ndjson = $this->formatBatchPayload();
-            Log::debug("AppInsights NDJSON Payload", ['ndjson' => $ndjson]);
+            Logger::debug("AppInsights NDJSON Payload", ['ndjson' => $ndjson]);
         } catch (\Throwable $e) {
-            Log::error("Failed to format AppInsights NDJSON payload: " . $e->getMessage());
+            Logger::error("Failed to format AppInsights NDJSON payload: " . $e->getMessage());
         }
     }
 
@@ -450,9 +435,7 @@ class Telemetry_Client
         $minutes = floor(($milliseconds % 3600000) / 60000);
         $seconds = floor(($milliseconds % 60000) / 1000);
         $ms = $milliseconds % 1000;
-        if (Config::get('enableLocalLogging', false)){
-            Log::info("AppInsights duration formatted: {$milliseconds} {$hours}:{$minutes}:{$seconds}.{$ms}");
-        }
+        Logger::info("AppInsights duration formatted: {$milliseconds} {$hours}:{$minutes}:{$seconds}.{$ms}");
         return sprintf('%02d:%02d:%02d.%03d', $hours, $minutes, $seconds, $ms);
     }
 
