@@ -178,7 +178,7 @@ class Telemetry_Client
                     'responseCode' => (string) $responseCode,
                     'success' => $success,
                     'url' => $baseUrl,
-                    'properties' => $properties,
+                    'properties' => (object) $properties,
                 ]
             ]
         ];
@@ -253,7 +253,7 @@ class Telemetry_Client
                         'parsedStack' => $trace,
                     ]],
                     'severityLevel' => 3, // 0=Verbose, 1=Info, 2=Warning, 3=Error, 4=Critical
-                    'properties' => $properties
+                    'properties' => (object) $properties
                 ]
             ]
         ];
@@ -312,7 +312,7 @@ class Telemetry_Client
                 'baseData' => [
                     'ver' => 2,
                     'name' => $eventName,
-                    'properties' => $properties
+                    'properties' => (object) $properties
                 ]
             ]
         ];
@@ -352,7 +352,7 @@ class Telemetry_Client
                     'ver' => 2,
                     'message' => $message,
                     'severityLevel' => $severity,
-                    'properties' => $properties
+                    'properties' => (object) $properties
                 ]
             ]
         ];

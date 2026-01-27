@@ -264,6 +264,10 @@ This ensures the JS file is copied to your `public/vendor/appinsights/js` folder
 
 ## Release Notes
 
+### v1.2.1 (January 26, 2026)
+- **Fix for Empty Properties:** Fixed an issue where telemetry was rejected when properties were empty. These are now correctly cast to objects to ensure proper JSON serialization (`{}` instead of `[]`).
+- **Improved Request Context in Exceptions:** Added a fallback to capture request data using the Laravel `request()` helper when the request object is missing from the exception's stack trace, which is common in production environments.
+
 ### v1.2.0 (January 19, 2026)
 - **Production Reporting Fix:** Fixed an issue where exceptions were not reported when the application was in production mode.
 - **Centralized Logging:** Refactored logging to use a centralized `Logger` class that respects the `enable_local_logging` configuration.
