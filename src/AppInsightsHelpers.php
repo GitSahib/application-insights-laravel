@@ -90,7 +90,14 @@ class AppInsightsHelpers
         {
             return;
         }
-        $properties = array_merge($this->getRequestPropertiesFromException($e) ?? [], $properties);
+
+        $requestProperties = $this->getRequestPropertiesFromException($e) ?? [];
+
+        if (empty($requestProperties) && function_exists('request') && request() instanceof Request) {
+            $requestProperties = $this->getRequestProperties(request());
+        }
+
+        $properties = array_merge($requestProperties, $properties);
         /** @disregard Undefined type 'AIServer' */
         \AIServer::trackException($e, $properties);
         $this->flush();
