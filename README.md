@@ -264,6 +264,11 @@ This ensures the JS file is copied to your `public/vendor/appinsights/js` folder
 
 ## Release Notes
 
+### v1.2.2 (February 28, 2026)
+- **Dependency telemetry:** Added `trackDependency` support in the telemetry client to send dependency payloads (e.g., SQL, HTTP) with properties and measurements.
+- **Automatic DB tracking:** Service provider now hooks Laravel's query listener to emit SQL dependency telemetry when `MS_AI_ENABLE_DEPENDENCY_TELEMETRY` is enabled.
+- **Config toggles:** New config flags to enable dependency telemetry and optionally include query bindings (`MS_AI_DB_DEP_BINDINGS`).
+
 ### v1.2.1 (January 26, 2026)
 - **Fix for Empty Properties:** Fixed an issue where telemetry was rejected when properties were empty. These are now correctly cast to objects to ensure proper JSON serialization (`{}` instead of `[]`).
 - **Improved Request Context in Exceptions:** Added a fallback to capture request data using the Laravel `request()` helper when the request object is missing from the exception's stack trace, which is common in production environments.

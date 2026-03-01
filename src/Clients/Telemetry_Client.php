@@ -360,6 +360,58 @@ class Telemetry_Client
         $this->sendPayload($payload);
     }
 
+    /**
+     * Tracks a dependency (outbound call) with the Application Insights service.
+     *
+     * @param string $name Friendly name for the dependency call.
+     * @param string $type Dependency type (e.g., Http, SQL, Queue).
+     * @param string $target The remote target (host or resource).
+     * @param float $durationMs Duration in milliseconds.
+     * @param bool $success Whether the call was successful.
+     * @param string|null $data Optional command/query or URL.
+     * @param string|null $resultCode Optional result code (e.g., HTTP status, SQL error code).
+     * @param array $properties Additional custom properties.
+     * @param array $measurements Numeric measurements to attach.
+     * @return void
+     */
+    public function trackDependency(
+        string $name,
+        string $type,
+        string $target,
+        float $durationMs,
+        bool $success,
+        ?string $data = null,
+        ?string $resultCode = null,
+        array $properties = [],
+        array $measurements = []
+    ) {
+        $properties = $properties ?? [];
+        $properties = array_merge($this->globalProperties ?? [], $properties);
+        $payload = [
+            'name' => 'Microsoft.ApplicationInsights.RemoteDependency',
+            'time' => Carbon::now()->toIso8601ZuluString(),
+            'iKey' => $this->instrumentationKey,
+            'data' => [
+                'baseType' => 'RemoteDependencyData',
+                'baseData' => [
+                    'ver' => 2,
+                    'id' => uniqid(),
+                    'name' => $name,
+                    'resultCode' => $resultCode,
+                    'duration' => $this->formatDuration($durationMs),
+                    'success' => $success,
+                    'data' => $data,
+                    'target' => $target,
+                    'type' => $type,
+                    'properties' => (object) $properties,
+                    'measurements' => (object) ($measurements ?? []),
+                ]
+            ]
+        ];
+
+        $this->sendPayload($payload);
+    }
+
     protected function sendPayload(array $payload)
     {
         $this->buffer[] = $payload;
