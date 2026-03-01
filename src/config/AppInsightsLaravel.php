@@ -20,5 +20,7 @@ return [
     'enable_local_logging' => env('MS_AI_ENABLE_LOGGING', 0),
     'connection_string' => env('MS_AI_CONNECTION_STRING', null),
     'max_query_params' => env('MS_AI_MAX_QUERY_PARAMS', 10),
+    'enable_dependency_telemetry' => env('MS_AI_ENABLE_DEPENDENCY_TELEMETRY', false),
+    'db_dependency_capture_bindings' => env('MS_AI_DB_DEP_BINDINGS', false),
 
 ];

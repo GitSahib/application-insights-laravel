@@ -5,11 +5,14 @@ namespace Larasahib\AppInsightsLaravel\Providers;
 use Larasahib\AppInsightsLaravel\Clients\Telemetry_Client;
 use Laravel\Lumen\Application as LumenApplication;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
+use Illuminate\Support\Facades\DB;
 use Larasahib\AppInsightsLaravel\Middleware\AppInsightsWebMiddleware;
 use Larasahib\AppInsightsLaravel\Middleware\AppInsightsApiMiddleware;
 use Larasahib\AppInsightsLaravel\AppInsightsClient;
 use Larasahib\AppInsightsLaravel\AppInsightsHelpers;
 use Larasahib\AppInsightsLaravel\AppInsightsServer;
+use Larasahib\AppInsightsLaravel\Support\Config;
+use Larasahib\AppInsightsLaravel\Support\Logger;
 
 class AppInsightsServiceProvider extends LaravelServiceProvider {
 
@@ -27,6 +30,7 @@ class AppInsightsServiceProvider extends LaravelServiceProvider {
      */
     public function boot() {
         $this->handleConfigs();
+        $this->registerDependencyListeners();
     }
 
     /**
@@ -88,6 +92,61 @@ class AppInsightsServiceProvider extends LaravelServiceProvider {
 
         $this->mergeConfigFrom($configPath, 'appinsights-laravel');
         
+    }
+
+    /**
+     * Hook lightweight listeners to automatically track dependencies (e.g., DB queries).
+     */
+    private function registerDependencyListeners(): void
+    {
+        if (!Config::get('enable_dependency_telemetry', false)) {
+            return;
+        }
+
+        try {
+            $appInsights = $this->app->make('AppInsightsServer');
+
+            // DB query listener (logs successful queries as dependencies)
+            DB::listen(function ($query) use ($appInsights) {
+                // Avoid work if telemetry client is unavailable
+                if (!$appInsights || !$appInsights->telemetryClient) {
+                    return;
+                }
+
+                $durationMs = (float) ($query->time ?? 0.0);
+                $connection = $query->connection ?? null;
+                $config = method_exists($connection, 'getConfig') ? ($connection->getConfig() ?? []) : [];
+
+                $targetHost = $config['host'] ?? 'database';
+                $targetPort = $config['port'] ?? null;
+                $target = $targetPort ? $targetHost . ':' . $targetPort : $targetHost;
+
+                $properties = [
+                    'connection' => $query->connectionName ?? null,
+                    'database' => $config['database'] ?? null,
+                ];
+
+                if (Config::get('db_dependency_capture_bindings', false)) {
+                    $properties['bindings'] = $query->bindings ?? [];
+                }
+
+                $data = $query->sql ?? '';
+
+                // Use SQL dependency type per App Insights schema
+                $appInsights->trackDependency(
+                    'sql:' . ($query->connectionName ?? 'default'),
+                    'SQL',
+                    $target,
+                    $durationMs,
+                    true,
+                    $data,
+                    null,
+                    $properties
+                );
+            });
+        } catch (\Throwable $e) {
+            Logger::error('AppInsights dependency listener registration failed: ' . $e->getMessage(), ['exception' => $e]);
+        }
     }
 
     /**
